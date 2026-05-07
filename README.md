@@ -1,0 +1,129 @@
+# DiabetesAssist — Medical RAG Chatbot
+
+> A clinical reference chatbot specializing in diabetes care, powered by verified medical documents.
+
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-0.3-green?logo=chainlink&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-1.0-orange)
+![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai&logoColor=white)
+![Anthropic](https://img.shields.io/badge/Anthropic-Claude-191919?logo=anthropic&logoColor=white)
+![Langfuse](https://img.shields.io/badge/Langfuse-Observability-purple)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![Docling](https://img.shields.io/badge/Docling-PDF%20Parsing-red)
+
+---
+
+## Overview
+
+DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Generation) pipeline over verified medical PDFs. It streams responses token-by-token, remembers conversation history per session, and is fully observable via Langfuse.
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| LLM | OpenAI GPT-4o / GPT-4o-mini |
+| Eval Judge | Anthropic Claude / OpenAI GPT-4o |
+| Agent | LangGraph |
+| Embeddings | OpenAI text-embedding-3-small |
+| Vector Store | ChromaDB |
+| PDF Parsing | [Docling](https://github.com/DS4SD/docling) |
+| Observability | Langfuse |
+| API | FastAPI |
+| Memory | SQLite (aiosqlite) |
+| Container | Docker |
+
+## Features
+
+- **RAG pipeline** — ingests medical PDFs, chunks, embeds, and retrieves with ChromaDB
+- **Streaming responses** — token-by-token streaming via FastAPI
+- **Persistent memory** — per-session conversation history stored in SQLite
+- **LangGraph agent** — tool-calling agent with conditional routing
+- **Langfuse observability** — every trace logged with tokens, latency, and costs
+- **LLM-as-Judge eval** — automated evaluation notebook scoring faithfulness and relevance
+- **Dockerized** — single command to build and run
+
+## Project Structure
+
+```
+medical-rag/
+├── main.py              # FastAPI app — serves UI and /chat endpoint
+├── agent.py             # LangGraph agent with streaming
+├── deps.py              # Shared dependencies (LLM, vectorstore)
+├── tool.py              # document_search RAG tool
+├── schemas.py           # Pydantic request/response models
+├── index.html           # Chatbot UI
+├── requirements.txt     # Python dependencies
+├── Dockerfile           # Container definition
+├── chroma_db/
+│   └── ingest.py        # PDF ingestion pipeline
+├── data/                # Medical PDF source files
+└── evals/
+    ├── diabetes_rag_eval.ipynb   # RAG evaluation notebook
+    └── requirements_eval.txt     # Eval dependencies
+```
+
+## Setup
+
+**1. Clone and configure:**
+```bash
+git clone <your-repo>
+cd medical-rag
+```
+
+Create a `.env` file:
+```
+OPENAI_API_KEY=your_key
+LANGFUSE_PUBLIC_KEY=your_key
+LANGFUSE_SECRET_KEY=your_key
+LANGFUSE_BASE_URL=https://us.cloud.langfuse.com
+```
+
+**2. Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+**3. Add PDFs to `data/` and run ingestion:**
+```bash
+python chroma_db/ingest.py
+```
+> Docling downloads ~1GB of models on first run. Subsequent runs use cached `.md` files — only new PDFs are re-parsed.
+
+**4. Start the server:**
+```bash
+uvicorn main:app --port 8000
+```
+
+Open `http://localhost:8000` in your browser.
+
+## Docker
+
+```bash
+# Build
+docker build -t medical-rag .
+
+# Run
+docker run -p 8000:8000 \
+  -e OPENAI_API_KEY=your_key \
+  -v $(pwd)/memory.db:/app/memory.db \
+  medical-rag
+```
+
+## Evaluation
+
+```bash
+pip install -r evals/requirements_eval.txt
+jupyter notebook evals/diabetes_rag_eval.ipynb
+```
+
+Runs 5 diabetes questions through the full RAG pipeline and scores each answer 1–5 for **faithfulness** and **relevance** using an LLM judge. Results are displayed as a summary table with average scores.
+
+## API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Chatbot UI |
+| `POST` | `/chat` | Stream a response |
+| `POST` | `/reset` | Clear conversation memory |
+| `GET` | `/docs` | Auto-generated API docs |

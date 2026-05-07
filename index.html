@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiabetesAssist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e14;
+    --surface: #111820;
+    --surface2: #1a2433;
+    --border: #1e2d3d;
+    --accent: #00d4aa;
+    --accent-dim: #00d4aa22;
+    --accent2: #0094ff;
+    --text: #c8d6e5;
+    --text-dim: #4a6080;
+    --text-bright: #e8f4ff;
+    --user-bg: #0d1f35;
+    --danger: #ff4757;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    margin-left: auto;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 40px;
+  }
+
+  .empty-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--accent-dim), #0094ff22);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  .empty-title {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-bright);
+    letter-spacing: -0.02em;
+    text-align: center;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    max-width: 340px;
+    line-height: 1.6;
+  }
+
+  .suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .suggestion {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    font-family: var(--sans);
+  }
+
+  .suggestion:hover {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--text-bright);
+  }
+
+  .suggestion-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 720px;
+    animation: fadeUp 0.2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+  .msg-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0 4px;
+  }
+
+  .msg-bubble {
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 100%;
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--user-bg);
+    border: 1px solid var(--border);
+    color: var(--text-bright);
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg.assistant .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg.assistant .msg-bubble.streaming {
+    border-color: var(--accent);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink 0.8s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .msg-bubble.error {
+    background: #1a0a0a;
+    border-color: var(--danger);
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 10px 10px 16px;
+    transition: border-color 0.15s;
+  }
+
+  .input-row:focus-within { border-color: var(--accent); }
+
+  textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-bright);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    min-height: 24px;
+    max-height: 120px;
+    padding: 0;
+  }
+
+  textarea::placeholder { color: var(--text-dim); }
+
+  .send-btn {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .send-btn svg { width: 16px; height: 16px; }
+
+  .input-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    padding: 0 4px;
+  }
+
+  .session-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .session-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .session-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    width: 120px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">D+</div>
+  <div>
+    <div class="header-title">DiabetesAssist</div>
+  </div>
+  <div class="header-sub">
+    <span class="status-dot"></span>connected
+  </div>
+</header>
+
+<div class="session-bar">
+  <span class="session-label">session</span>
+  <input class="session-input" id="sessionId" value="user-001" spellcheck="false"/>
+  <button onclick="resetMemory()" style="font-family:var(--mono);font-size:10px;color:var(--text-dim);background:none;border:none;cursor:pointer;margin-left:auto;">reset</button>
+</div>
+
+
+
+<div class="messages" id="messages">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🩺</div>
+    <div>
+      <div class="empty-title">Diabetes clinical assistant</div>
+      <div class="empty-sub" style="margin-top:8px">Ask questions about diabetes management, medications, blood glucose targets, and treatment guidelines.</div>
+    </div>
+    <div class="suggestions">
+      <button class="suggestion" onclick="suggest(this)">
+        <span class="suggestion-label">medication</span>
+        What is the recommended dosage for metformin in type 2 diabetes?
+      </button>
+      <button class="suggestion" onclick="suggest(this)">
+        <span class="suggestion-label">targets</span>
+        What are the HbA1c targets for type 2 diabetes management?
+      </button>
+      <button class="suggestion" onclick="suggest(this)">
+        <span class="suggestion-label">hypertension</span>
+        How should hypertension be managed in patients with diabetes?
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="input-area">
+  <div class="input-row">
+    <textarea
+      id="input"
+      placeholder="Ask a clinical question..."
+      rows="1"
+      onkeydown="handleKey(event)"
+      oninput="autoResize(this)"
+    ></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+  <div class="input-hint">↵ send &nbsp;·&nbsp; shift+↵ newline &nbsp;·&nbsp; answers stream from your RAG pipeline</div>
+</div>
+
+<script>
+const API = '/chat';
+let isStreaming = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function suggest(btn) {
+  const text = btn.innerText.replace(/^[A-Z]+\n/, '').trim();
+  document.getElementById('input').value = text;
+  sendMessage();
+}
+
+function addMessage(role, content, streaming = false) {
+  const empty = document.getElementById('emptyState');
+  if (empty) empty.remove();
+
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+
+  const roleLabel = document.createElement('div');
+  roleLabel.className = 'msg-role';
+  roleLabel.textContent = role === 'user' ? 'you' : 'diabetesassist';
+
+  const bubble = document.createElement('div');
+  bubble.className = `msg-bubble${streaming ? ' streaming' : ''}`;
+  bubble.textContent = content;
+
+  if (streaming) {
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    bubble.appendChild(cursor);
+  }
+
+  div.appendChild(roleLabel);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  return bubble;
+}
+
+async function sendMessage() {
+  if (isStreaming) return;
+
+  const input = document.getElementById('input');
+  const message = input.value.trim();
+  if (!message) return;
+
+  const sessionId = document.getElementById('sessionId').value || 'default';
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+  isStreaming = true;
+
+  addMessage('user', message);
+  const bubble = addMessage('assistant', '', true);
+  let text = '';
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, session_id: sessionId })
+    });
+
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      text += chunk;
+      bubble.textContent = text;
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      bubble.appendChild(cursor);
+      document.getElementById('messages').scrollTop = 999999;
+    }
+
+    bubble.textContent = text;
+    bubble.classList.remove('streaming');
+
+  } catch (err) {
+    bubble.textContent = `Error: ${err.message}`;
+    bubble.classList.add('error');
+    bubble.classList.remove('streaming');
+  }
+
+  isStreaming = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('input').focus();
+}
+
+async function resetMemory() {
+  await fetch('/reset', { method: 'POST' });
+  document.getElementById('messages').innerHTML = '';
+}
+</script>
+</body>
+</html>
