@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What is the preferred insulin treatment for most adults with type 1 diabetes?",
+    "answer": "Continuous subcutaneous insulin infusion or multiple daily doses of prandial and basal insulin.",
+    "correct": 1
+  },
+  {
+    "question": "Do insulin analogs reduce hypoglycemia risk compared with human insulins?",
+    "answer": "Yes, insulin analogs are preferred because they reduce hypoglycemia risk.",
+    "correct": 1
+  },
+  {
+    "question": "What percentage reduction in microvascular complications was observed in the DCCT intensive therapy group?",
+    "answer": "Approximately 50% reduction.",
+    "correct": 1
+  },
+  {
+    "question": "Was intensive insulin therapy associated with lower severe hypoglycemia rates in the DCCT trial?",
+    "answer": "No, it was associated with higher severe hypoglycemia rates.",
+    "correct": 1
+  },
+  {
+    "question": "Can inhaled insulin be used instead of injectable prandial insulin in the U.S.?",
+    "answer": "Yes, inhaled insulin may replace injectable prandial insulin.",
+    "correct": 1
+  },
+  {
+    "question": "Are NPH insulins more expensive than long-acting analogs?",
+    "answer": "Yes, NPH insulins are generally more expensive.",
+    "correct": 0
+  },
+  {
+    "question": "What is the fasting plasma glucose diagnostic threshold for diabetes mellitus?",
+    "answer": "Greater than or equal to 7.0 mmol/L or 126 mg/dL.",
+    "correct": 1
+  },
+  {
+    "question": "Should diabetes diagnosis in asymptomatic individuals be based on a single abnormal glucose value?",
+    "answer": "No, repeat testing is required unless symptoms are unequivocal.",
+    "correct": 1
+  },
+  {
+    "question": "What does IFG stand for?",
+    "answer": "Impaired fasting glucose.",
+    "correct": 1
+  },
+  {
+    "question": "Does type 2 diabetes always require insulin for survival?",
+    "answer": "Yes, all type 2 diabetes patients require insulin for survival.",
+    "correct": 0
+  },
+  {
+    "question": "What blood pressure defines hypertension?",
+    "answer": "Blood pressure greater than or equal to 140/90 mmHg.",
+    "correct": 1
+  },
+  {
+    "question": "What percentage decrease in systolic blood pressure reduces diabetes-related mortality according to the guideline?",
+    "answer": "Each 10 mmHg decrease lowers diabetes-related mortality by 15%.",
+    "correct": 1
+  },
+  {
+    "question": "Is macrovascular disease a major cause of mortality in diabetes mellitus?",
+    "answer": "Yes, it accounts for most diabetes-related mortality.",
+    "correct": 1
+  },
+  {
+    "question": "Is prehypertension defined as systolic blood pressure above 160 mmHg?",
+    "answer": "Yes, prehypertension starts at 160 mmHg systolic.",
+    "correct": 0
+  },
+  {
+    "question": "What HbA1c target is recommended for diabetes management?",
+    "answer": "An HbA1c below 7.0%.",
+    "correct": 1
+  },
+  {
+    "question": "What organization published the Clinical Management of COVID-19 living guideline?",
+    "answer": "The World Health Organization (WHO).",
+    "correct": 1
+  },
+  {
+    "question": "What is the recommendation for awake prone positioning in severe COVID-19 patients?",
+    "answer": "WHO conditionally recommends awake prone positioning for severely ill hospitalized patients requiring oxygen or non-invasive ventilation.",
+    "correct": 1
+  },
+  {
+    "question": "Does WHO strongly recommend against awake prone positioning in COVID-19 patients?",
+    "answer": "Yes, WHO strongly recommends against it.",
+    "correct": 0
+  },
+  {
+    "question": "What percentage of symptomatic COVID-19 patients developed severe disease requiring oxygen support according to 2020 data?",
+    "answer": "Approximately 15%.",
+    "correct": 1
+  },
+  {
+    "question": "What condition is also known as long COVID?",
+    "answer": "Post COVID-19 condition (PCC).",
+    "correct": 1
+  }
+]

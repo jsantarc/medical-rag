@@ -1,0 +1,66 @@
+[
+  {
+    "input": {"question": "What is the preferred insulin treatment for most adults with type 1 diabetes?"},
+    "expected_output": {"answer": "Continuous subcutaneous insulin infusion or multiple daily doses of prandial and basal insulin."}
+  },
+  {
+    "input": {"question": "Do insulin analogs reduce hypoglycemia risk compared with human insulins?"},
+    "expected_output": {"answer": "Yes, insulin analogs are preferred because they reduce hypoglycemia risk."}
+  },
+  {
+    "input": {"question": "What percentage reduction in microvascular complications was observed in the DCCT intensive therapy group?"},
+    "expected_output": {"answer": "Approximately 50% reduction."}
+  },
+  {
+    "input": {"question": "Was intensive insulin therapy associated with lower severe hypoglycemia rates in the DCCT trial?"},
+    "expected_output": {"answer": "No, it was associated with higher severe hypoglycemia rates."}
+  },
+  {
+    "input": {"question": "Can inhaled insulin be used instead of injectable prandial insulin in the U.S.?"},
+    "expected_output": {"answer": "Yes, inhaled insulin may replace injectable prandial insulin."}
+  },
+  {
+    "input": {"question": "What is the fasting plasma glucose diagnostic threshold for diabetes mellitus?"},
+    "expected_output": {"answer": "Greater than or equal to 7.0 mmol/L or 126 mg/dL."}
+  },
+  {
+    "input": {"question": "Should diabetes diagnosis in asymptomatic individuals be based on a single abnormal glucose value?"},
+    "expected_output": {"answer": "No, repeat testing is required unless symptoms are unequivocal."}
+  },
+  {
+    "input": {"question": "What does IFG stand for?"},
+    "expected_output": {"answer": "Impaired fasting glucose."}
+  },
+  {
+    "input": {"question": "What blood pressure defines hypertension?"},
+    "expected_output": {"answer": "Blood pressure greater than or equal to 140/90 mmHg."}
+  },
+  {
+    "input": {"question": "What percentage decrease in systolic blood pressure reduces diabetes-related mortality according to the guideline?"},
+    "expected_output": {"answer": "Each 10 mmHg decrease lowers diabetes-related mortality by 15%."}
+  },
+  {
+    "input": {"question": "Is macrovascular disease a major cause of mortality in diabetes mellitus?"},
+    "expected_output": {"answer": "Yes, it accounts for most diabetes-related mortality."}
+  },
+  {
+    "input": {"question": "What HbA1c target is recommended for diabetes management?"},
+    "expected_output": {"answer": "An HbA1c below 7.0%."}
+  },
+  {
+    "input": {"question": "What organization published the Clinical Management of COVID-19 living guideline?"},
+    "expected_output": {"answer": "The World Health Organization (WHO)."}
+  },
+  {
+    "input": {"question": "What is the recommendation for awake prone positioning in severe COVID-19 patients?"},
+    "expected_output": {"answer": "WHO conditionally recommends awake prone positioning for severely ill hospitalized patients requiring oxygen or non-invasive ventilation."}
+  },
+  {
+    "input": {"question": "What percentage of symptomatic COVID-19 patients developed severe disease requiring oxygen support according to 2020 data?"},
+    "expected_output": {"answer": "Approximately 15%."}
+  },
+  {
+    "input": {"question": "What condition is also known as long COVID?"},
+    "expected_output": {"answer": "Post COVID-19 condition (PCC)."}
+  }
+]
