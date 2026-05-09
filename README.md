@@ -41,26 +41,33 @@ DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Gener
 - **LangGraph agent** — tool-calling agent with conditional routing
 - **Langfuse observability** — every trace logged with tokens, latency, and costs
 - **LLM-as-Judge eval** — automated evaluation notebook scoring faithfulness and relevance
+- **Correctness dataset** — ground-truth Q&A pairs uploaded to Langfuse for repeatable evals
+- **Cached agent** — LangGraph agent and SQLite checkpointer built once at startup, not per request
+- **Safe reset** — `/reset` clears both `memory.db` and the in-memory agent cache
 - **Dockerized** — single command to build and run
 
 ## Project Structure
 
 ```
 medical-rag/
-├── main.py              # FastAPI app — serves UI and /chat endpoint
-├── agent.py             # LangGraph agent with streaming
+├── main.py              # FastAPI app — serves UI, /chat, and /reset endpoints
+├── agent.py             # LangGraph agent with streaming and cached checkpointer
 ├── deps.py              # Shared dependencies (LLM, vectorstore)
 ├── tool.py              # document_search RAG tool
 ├── schemas.py           # Pydantic request/response models
 ├── index.html           # Chatbot UI
 ├── requirements.txt     # Python dependencies
 ├── Dockerfile           # Container definition
+├── assets/              # Project assets (images, etc.)
 ├── chroma_db/
 │   └── ingest.py        # PDF ingestion pipeline
-├── data/                # Medical PDF source files
+├── data/                # Medical PDF source files + cached markdown
 └── evals/
-    ├── diabetes_rag_eval.ipynb   # RAG evaluation notebook
-    └── requirements_eval.txt     # Eval dependencies
+    ├── diabetes_rag_eval.ipynb          # RAG evaluation — retrieve, generate, LLM judge
+    ├── langfuse_dataset_upload.ipynb    # Upload correctness dataset to Langfuse
+    ├── llm_eval_dataset.json            # Raw Q&A eval pairs
+    ├── langfuse_dataset_medical-rag-eval.json  # Langfuse-formatted dataset
+    └── requirements_eval.txt            # Eval dependencies
 ```
 
 ## Setup
@@ -114,10 +121,21 @@ docker run -p 8000:8000 \
 
 ```bash
 pip install -r evals/requirements_eval.txt
-jupyter notebook evals/diabetes_rag_eval.ipynb
 ```
 
-Runs 5 diabetes questions through the full RAG pipeline and scores each answer 1–5 for **faithfulness** and **relevance** using an LLM judge. Results are displayed as a summary table with average scores.
+Two notebooks in `evals/`:
+
+**1. Upload correctness dataset to Langfuse:**
+```bash
+jupyter notebook evals/langfuse_dataset_upload.ipynb
+```
+Loads ground-truth Q&A pairs from `langfuse_dataset_medical-rag-eval.json` and uploads them to Langfuse as a reusable correctness dataset.
+
+**2. Run RAG eval:**
+```bash
+jupyter notebook evals/diabetes_rag_eval.ipynb
+```
+Runs questions through the full RAG pipeline and scores each answer 1–5 for **faithfulness** and **relevance** using an LLM judge. Results are displayed as a summary table with average scores.
 
 ## API
 
