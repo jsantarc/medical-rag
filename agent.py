@@ -1,4 +1,4 @@
-import os
+import aiosqlite
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,6 +32,8 @@ tools = [document_search]
 tool_node = ToolNode(tools)
 llm = AGENT_PROMPT | make_obj().bind_tools(tools)
 
+_agent = None
+
 
 def call_model(state: MessagesState):
     response = llm.invoke({"messages": state["messages"]})
@@ -52,16 +54,28 @@ def _build_graph():
     graph.add_edge("tools", "agent")
     return graph
 
+async def _get_agent():
+    global _agent
+    if _agent is None:
+        conn = await aiosqlite.connect("memory.db")
+        checkpointer = AsyncSqliteSaver(conn)
+        await checkpointer.setup()
+        _agent = _build_graph().compile(checkpointer=checkpointer)
+    return _agent
+
+def reset_agent():
+    global _agent
+    _agent = None
+
 async def stream_agent_response(message: str, session_id: str = "default"):
-    async with AsyncSqliteSaver.from_conn_string("memory.db") as checkpointer:
-        agent  = _build_graph().compile(checkpointer=checkpointer)
-        config = {"configurable": {"thread_id": session_id}, "callbacks": [langfuse_handler]}
-        async for event in agent.astream_events(
-            {"messages": [HumanMessage(content=message)]},
-            config=config,
-            version="v2"
-        ):
-            if event["event"] == "on_chat_model_stream":
-                token = event["data"]["chunk"].content
-                if token:
-                    yield token
+    agent = await _get_agent()
+    config = {"configurable": {"thread_id": session_id}, "callbacks": [langfuse_handler]}
+    async for event in agent.astream_events(
+        {"messages": [HumanMessage(content=message)]},
+        config=config,
+        version="v2"
+    ):
+        if event["event"] == "on_chat_model_stream":
+            token = event["data"]["chunk"].content
+            if token:
+                yield token

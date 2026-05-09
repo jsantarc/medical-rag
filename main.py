@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from schemas import ChatRequest
 
 from fastapi.responses import StreamingResponse, FileResponse
-from agent import stream_agent_response
+from agent import stream_agent_response, reset_agent
 
 load_dotenv()
 
@@ -63,6 +63,7 @@ async def chat(request: ChatRequest):
 
 @app.post("/reset")
 async def reset_memory():
+    reset_agent()
     if os.path.exists("memory.db"):
         os.remove("memory.db")
     return {"status": "memory cleared"}
