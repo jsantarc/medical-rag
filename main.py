@@ -20,10 +20,20 @@ logger = logging.getLogger(__name__)
 
 # FastAPI app — this is the object that holds all your routes
 # title and description show up in the /docs UI automatically
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if os.path.exists("memory.db"):
+        os.remove("memory.db")
+        logger.info("Cleared memory.db on startup")
+    yield
+
 app = FastAPI(
     title="Medical RAG Chatbot",
     description="Ask clinical questions answered from your medical PDF library.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS allows browser clients to call the API from a different domain
