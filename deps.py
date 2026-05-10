@@ -13,7 +13,7 @@ CHAT_MODEL  = os.getenv("CHAT_MODEL", "gpt-4o-mini")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "text-embedding-3-small")
 CHROMA_DIR  = str(Path(__file__).parent / "chroma_db" / "chroma_db")
 
-#@lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def make_obj():
        # streaming=True is required for token-by-token streaming later
     # temperature=0 keeps medical answers deterministic

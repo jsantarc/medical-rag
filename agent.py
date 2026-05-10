@@ -1,3 +1,4 @@
+import time
 import aiosqlite
 
 from dotenv import load_dotenv
@@ -68,8 +69,12 @@ def reset_agent():
     _agent = None
 
 async def stream_agent_response(message: str, session_id: str = "default"):
+    t0 = time.time()
     agent = await _get_agent()
+    print(f"[timing] agent ready: {time.time() - t0:.2f}s")
+
     config = {"configurable": {"thread_id": session_id}, "callbacks": [langfuse_handler]}
+    first_token = True
     async for event in agent.astream_events(
         {"messages": [HumanMessage(content=message)]},
         config=config,
@@ -78,4 +83,8 @@ async def stream_agent_response(message: str, session_id: str = "default"):
         if event["event"] == "on_chat_model_stream":
             token = event["data"]["chunk"].content
             if token:
+                if first_token:
+                    print(f"[timing] first token: {time.time() - t0:.2f}s")
+                    first_token = False
                 yield token
+    print(f"[timing] total: {time.time() - t0:.2f}s")
