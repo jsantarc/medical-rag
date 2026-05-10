@@ -137,6 +137,28 @@ jupyter notebook evals/diabetes_rag_eval.ipynb
 ```
 Runs questions through the full RAG pipeline and scores each answer 1–5 for **faithfulness** and **relevance** using an LLM judge. Results are displayed as a summary table with average scores.
 
+## Testing
+
+```bash
+pip install pytest
+```
+
+```bash
+pytest tests/unit/        # tests tool directly, no server needed
+pytest tests/integration/ # starts server automatically, tests full stack
+```
+
+> **Note:** Unit tests cover the `document_search` tool only. `schemas.py` is not tested yet — response schema (`ChatResponse`, `GroundingSource`) is defined but not enforced in the current agent flow.
+
+## Observability
+
+Every request is traced in Langfuse with:
+- The full conversation input and streamed output
+- A retrieval span per `document_search` call, including the query, retrieved chunks, and similarity scores
+- Latency and token counts per LLM call
+
+View traces at **cloud.langfuse.com → Traces**. Correctness scores logged via the eval notebook appear under **Scores**.
+
 ## API
 
 | Method | Endpoint | Description |
