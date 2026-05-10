@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.server.txt .
+RUN pip install --no-cache-dir -r requirements.server.txt
 
 # copy app source
 COPY main.py agent.py deps.py tool.py schemas.py index.html ./

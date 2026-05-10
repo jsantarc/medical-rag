@@ -1,0 +1,13 @@
+# Production server dependencies — excludes docling and text splitters (ingestion only)
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-chroma>=0.1.0
+langchain-openai>=0.1.0
+langgraph>=1.0.0
+langgraph-checkpoint-sqlite>=1.0.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-dotenv>=0.1.0
+chromadb>=0.1.0
+langfuse==4.5.1
+aiosqlite>=0.19.0

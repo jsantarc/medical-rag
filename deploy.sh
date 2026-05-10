@@ -2,9 +2,9 @@
 # Deploy agent files and ChromaDB to EC2
 # Usage: ./deploy.sh
 
-EC2_HOST="ec2-user@your-ec2-ip"   # change this
-SSH_KEY="~/.ssh/your-key.pem"     # change this
-REMOTE_DIR="/home/ec2-user/medical-rag"
+#EC2_HOST="ec2-user@13.223.41.3"
+SSH_KEY="./rag-key.pem"
+REMOTE_DIR="/home/ec2-user/app"
 
 echo "Deploying to $EC2_HOST..."
 
@@ -16,11 +16,20 @@ rsync -avz --progress \
   --include="tool.py" \
   --include="schemas.py" \
   --include="requirements.txt" \
+  --include="requirements.server.txt" \
   --include="index.html" \
+  --include="Dockerfile" \
+  --include=".env" \
   --include="chroma_db/" \
   --include="chroma_db/**" \
   --exclude="*" \
   ./ "$EC2_HOST:$REMOTE_DIR"
 
-echo "Done. Start the server with:"
-echo "  ssh -i $SSH_KEY $EC2_HOST 'cd $REMOTE_DIR && uvicorn main:app --host 0.0.0.0 --port 8000'"
+echo "Building and starting Docker on EC2..."
+ssh -i $SSH_KEY $EC2_HOST "cd $REMOTE_DIR && \
+  docker stop rag-chatbot 2>/dev/null || true && \
+  docker rm rag-chatbot 2>/dev/null || true && \
+  docker build -t rag-chatbot . && \
+  docker run -d -p 8000:8000 --env-file .env --name rag-chatbot rag-chatbot"
+
+echo "Done. Server running at http://13.223.41.3:8000"
