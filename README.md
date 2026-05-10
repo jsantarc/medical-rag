@@ -11,6 +11,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?logo=fastapi&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![Docling](https://img.shields.io/badge/Docling-PDF%20Parsing-red)
+![AWS EC2](https://img.shields.io/badge/AWS-EC2%20Ready-FF9900?logo=amazon-aws&logoColor=white)
 
 ---
 
@@ -136,6 +137,22 @@ Loads ground-truth Q&A pairs from `langfuse_dataset_medical-rag-eval.json` and u
 jupyter notebook evals/diabetes_rag_eval.ipynb
 ```
 Runs questions through the full RAG pipeline and scores each answer 1–5 for **faithfulness** and **relevance** using an LLM judge. Results are displayed as a summary table with average scores.
+
+## EC2 Deployment
+
+Edit `deploy.sh` with your EC2 host and key, then run:
+
+```bash
+chmod 400 your-key.pem
+./deploy.sh
+```
+
+This rsyncs only the required agent files (`main.py`, `agent.py`, `deps.py`, `tool.py`, `schemas.py`, `index.html`, `chroma_db/`) — no eval notebooks, tests, or data PDFs.
+
+Start the server on EC2:
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
 ## Testing
 
