@@ -148,7 +148,9 @@ pytest tests/unit/        # tests tool directly, no server needed
 pytest tests/integration/ # starts server automatically, tests full stack
 ```
 
-> **Note:** Unit tests cover the `document_search` tool only. `schemas.py` is not tested yet — response schema (`ChatResponse`, `GroundingSource`) is defined but not enforced in the current agent flow.
+> **Note:** Unit tests are defined but not yet run — `pytest tests/unit/` covers `document_search` only. `schemas.py` is not tested yet — response schema (`ChatResponse`, `GroundingSource`) is defined but not enforced in the current agent flow. Langfuse integration is tested manually via `evals/diabetes_rag_eval.ipynb`.
+
+`experiments/agent_sandbox.ipynb` is a sandbox notebook for stepping through and experimenting with the agent components individually.
 
 ## Observability
 
