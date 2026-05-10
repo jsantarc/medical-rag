@@ -51,24 +51,33 @@ DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Gener
 
 ```
 medical-rag/
-├── main.py              # FastAPI app — serves UI, /chat, and /reset endpoints
-├── agent.py             # LangGraph agent with streaming and cached checkpointer
-├── deps.py              # Shared dependencies (LLM, vectorstore)
-├── tool.py              # document_search RAG tool
-├── schemas.py           # Pydantic request/response models
-├── index.html           # Chatbot UI
-├── requirements.txt     # Python dependencies
-├── Dockerfile           # Container definition
-├── assets/              # Project assets (images, etc.)
+├── main.py                   # FastAPI app — serves UI, /chat, and /reset endpoints
+├── agent.py                  # LangGraph agent with streaming and cached checkpointer
+├── deps.py                   # Shared dependencies (LLM, vectorstore)
+├── tool.py                   # document_search RAG tool (factory pattern, testing flag)
+├── schemas.py                # Pydantic request/response models (not yet enforced)
+├── index.html                # Chatbot UI
+├── requirements.txt          # Full dependencies (includes docling for ingestion)
+├── requirements.server.txt   # Production dependencies (excludes docling/torch)
+├── Dockerfile                # Container definition — uses requirements.server.txt
+├── deploy.sh                 # Rsync + Docker build/run on EC2
+├── assets/                   # Project assets (images, etc.)
 ├── chroma_db/
-│   └── ingest.py        # PDF ingestion pipeline
-├── data/                # Medical PDF source files + cached markdown
+│   └── ingest.py             # PDF ingestion pipeline (run locally, not on server)
+├── data/                     # Medical PDF source files + cached markdown
+├── experiments/
+│   └── agent_sandbox.ipynb   # Sandbox for stepping through agent components
+├── tests/
+│   ├── unit/
+│   │   └── test_tool.py      # Unit tests for document_search (no server needed)
+│   └── integration/
+│       └── test_agent.py     # Integration tests — starts server automatically
 └── evals/
-    ├── diabetes_rag_eval.ipynb          # RAG evaluation — retrieve, generate, LLM judge
-    ├── langfuse_dataset_upload.ipynb    # Upload correctness dataset to Langfuse
-    ├── llm_eval_dataset.json            # Raw Q&A eval pairs
-    ├── langfuse_dataset_medical-rag-eval.json  # Langfuse-formatted dataset
-    └── requirements_eval.txt            # Eval dependencies
+    ├── diabetes_rag_eval.ipynb                  # RAG eval — retrieve, generate, LLM judge
+    ├── langfuse_dataset_upload.ipynb            # Upload correctness dataset to Langfuse
+    ├── llm_eval_dataset.json                    # Raw Q&A eval pairs
+    ├── langfuse_dataset_medical-rag-eval.json   # Langfuse-formatted dataset
+    └── requirements_eval.txt                    # Eval dependencies
 ```
 
 ## Setup
