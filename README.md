@@ -39,7 +39,7 @@ The goal is to make it easy to prototype new agent ideas, compare orchestration 
 | Layer | Technology |
 |---|---|
 | LLM | OpenAI GPT-4o / GPT-4o-mini |
-| Eval Judge | Anthropic Claude / OpenAI GPT-4o |
+| Eval Judge | Anthropic Claude |
 | Agent | LangGraph |
 | Embeddings | OpenAI text-embedding-3-small |
 | Vector Store | ChromaDB |
