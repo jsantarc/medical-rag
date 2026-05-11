@@ -1,5 +1,31 @@
 # DiabetesAssist — Medical RAG Chatbot
 
+## Rapid Agent Prototyping
+
+This repository is designed as a lightweight environment for rapidly prototyping and evaluating AI agents locally or on EC2.
+
+The architecture keeps experimentation simple:
+
+- `agent_{name}.py`  
+  Individual agent implementations and workflows.
+
+- `agent_stream.py`  
+  Streaming wrapper used to stream agent responses in real time.
+
+- `main.py`  
+  Simple entry point for running and testing agents locally or through a deployed EC2 environment.
+
+The goal is to make it easy to:
+- prototype new agent ideas quickly,
+- compare orchestration strategies,
+- test prompts and retrieval pipelines,
+- inspect traces and evaluations,
+- and iterate without heavy infrastructure.
+
+This project acts as an experimentation sandbox for AI agent development rather than a production-ready medical system.
+
+
+
 > A clinical reference chatbot specializing in diabetes care, powered by verified medical documents.
 
 ![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
