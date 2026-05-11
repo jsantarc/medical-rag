@@ -1,17 +1,12 @@
-import time
 from dotenv import load_dotenv
 load_dotenv()
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, MessagesState, END
 from langgraph.prebuilt import ToolNode
-from langfuse.langchain import CallbackHandler
 
 from deps import make_obj
 from tool import document_search
-
-langfuse_handler = CallbackHandler()
 
 AGENT_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are DiabeticAssist, a clinical reference chatbot specializing in diabetes care.
@@ -50,22 +45,3 @@ def _build_graph():
     graph.add_conditional_edges("agent", should_continue)
     graph.add_edge("tools", "agent")
     return graph
-
-agent = _build_graph().compile().with_config({"recursion_limit": 10})
-
-
-async def stream_agent_response(message: str):
-    t0 = time.time()
-    config = {"callbacks": [langfuse_handler]}
-    first_token = True
-    async for msg, metadata in agent.astream(
-        {"messages": [HumanMessage(content=message)]},
-        config=config,
-        stream_mode="messages",
-    ):
-        if msg.content and metadata["langgraph_node"] == "agent":
-            if first_token:
-                print(f"[timing] first token: {time.time() - t0:.2f}s")
-                first_token = False
-            yield msg.content
-    print(f"[timing] total: {time.time() - t0:.2f}s")

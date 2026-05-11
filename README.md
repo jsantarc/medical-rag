@@ -17,7 +17,7 @@
 
 ## Overview
 
-DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Generation) pipeline over verified medical PDFs. It streams responses token-by-token, remembers conversation history per session, and is fully observable via Langfuse.
+DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Generation) pipeline over verified medical PDFs. It streams responses token-by-token and is fully observable via Langfuse.
 
 ## Stack
 
@@ -31,31 +31,28 @@ DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Gener
 | PDF Parsing | [Docling](https://github.com/DS4SD/docling) |
 | Observability | Langfuse |
 | API | FastAPI |
-| Memory | SQLite (aiosqlite) |
 | Container | Docker |
 
 ## Features
 
 - **RAG pipeline** — ingests medical PDFs, chunks, embeds, and retrieves with ChromaDB
 - **Streaming responses** — token-by-token streaming via FastAPI
-- **Persistent memory** — per-session conversation history stored in SQLite
 - **LangGraph agent** — tool-calling agent with conditional routing
 - **Langfuse observability** — every trace logged with tokens, latency, and costs
 - **LLM-as-Judge eval** — automated evaluation notebook scoring faithfulness and relevance
 - **Correctness dataset** — ground-truth Q&A pairs uploaded to Langfuse for repeatable evals
-- **Cached agent** — LangGraph agent and SQLite checkpointer built once at startup, not per request
-- **Safe reset** — `/reset` clears both `memory.db` and the in-memory agent cache
 - **Dockerized** — single command to build and run
 
 ## Project Structure
 
 ```
 medical-rag/
-├── main.py                   # FastAPI app — serves UI, /chat, and /reset endpoints
-├── agent.py                  # LangGraph agent with streaming and cached checkpointer
+├── main.py                   # FastAPI app — serves UI and /chat endpoint
+├── agent_graph.py            # LangGraph graph definition (nodes, edges, prompt)
+├── agent_stream.py           # Async streaming runner with Langfuse callback
 ├── deps.py                   # Shared dependencies (LLM, vectorstore)
 ├── tool.py                   # document_search RAG tool (factory pattern, testing flag)
-├── schemas.py                # Pydantic request/response models (not yet enforced)
+├── schemas.py                # Pydantic request/response models
 ├── index.html                # Chatbot UI
 ├── requirements.txt          # Full dependencies (includes docling for ingestion)
 ├── requirements.server.txt   # Production dependencies (excludes docling/torch)
@@ -66,7 +63,8 @@ medical-rag/
 │   └── ingest.py             # PDF ingestion pipeline (run locally, not on server)
 ├── data/                     # Medical PDF source files + cached markdown
 ├── experiments/
-│   └── agent_sandbox.ipynb   # Sandbox for stepping through agent components
+│   ├── agent_sandbox.ipynb       # Sandbox for stepping through agent components
+│   └── agent_state_sandbox.ipynb # Sandbox for exploring agent state
 ├── tests/
 │   ├── unit/
 │   │   └── test_tool.py      # Unit tests for document_search (no server needed)
@@ -121,10 +119,7 @@ Open `http://localhost:8000` in your browser.
 docker build -t medical-rag .
 
 # Run
-docker run -p 8000:8000 \
-  -e OPENAI_API_KEY=your_key \
-  -v $(pwd)/memory.db:/app/memory.db \
-  medical-rag
+docker run -p 8000:8000 --env-file .env medical-rag
 ```
 
 ## Evaluation
@@ -156,7 +151,7 @@ chmod 400 your-key.pem
 ./deploy.sh
 ```
 
-This rsyncs only the required agent files (`main.py`, `agent.py`, `deps.py`, `tool.py`, `schemas.py`, `index.html`, `chroma_db/`) — no eval notebooks, tests, or data PDFs.
+This rsyncs only the required files (`main.py`, `agent_graph.py`, `agent_stream.py`, `deps.py`, `tool.py`, `schemas.py`, `index.html`, `chroma_db/`) — no eval notebooks, tests, or data PDFs.
 
 Start the server on EC2:
 ```bash
@@ -193,5 +188,4 @@ View traces at **cloud.langfuse.com → Traces**. Correctness scores logged via 
 |--------|----------|-------------|
 | `GET` | `/` | Chatbot UI |
 | `POST` | `/chat` | Stream a response |
-| `POST` | `/reset` | Clear conversation memory |
 | `GET` | `/docs` | Auto-generated API docs |

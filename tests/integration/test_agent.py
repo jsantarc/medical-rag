@@ -11,8 +11,11 @@ Run with: pytest tests/integration/
 """
 import time
 import subprocess
+from pathlib import Path
 import pytest
 import requests
+
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 BASE_URL = "http://127.0.0.1:8000"
 
@@ -21,7 +24,7 @@ BASE_URL = "http://127.0.0.1:8000"
 def server():
     proc = subprocess.Popen(
         ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
-        cwd="../..",
+        cwd=PROJECT_ROOT,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
@@ -36,11 +39,10 @@ def server():
     proc.wait()
 
 
-def ask(question, session_id="test"):
-    requests.post(f"{BASE_URL}/reset")
+def ask(question):
     response = requests.post(
         f"{BASE_URL}/chat",
-        json={"message": question, "session_id": session_id}
+        json={"message": question}
     )
     return response.text
 

@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, FileResponse
 
 from schemas import ChatRequest
-from agent import stream_agent_response
+from agent_stream import stream_agent_response
 
 load_dotenv()
 

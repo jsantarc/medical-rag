@@ -11,7 +11,8 @@ echo "Deploying to $EC2_HOST..."
 rsync -avz --progress \
   -e "ssh -i $SSH_KEY" \
   --include="main.py" \
-  --include="agent.py" \
+  --include="agent_graph.py" \
+  --include="agent_stream.py" \
   --include="deps.py" \
   --include="tool.py" \
   --include="schemas.py" \
