@@ -1,44 +1,50 @@
 # tool.py
+from dotenv import load_dotenv
+load_dotenv()
+
 from langchain.tools import tool
 from deps import get_vectorstore
 
-try:
-    from langfuse import get_client
-    lf = get_client()
-except Exception:
-    lf = None
+@tool
+def document_search(query: str) -> str:
+    """Use this tool when you need to answer any medical or clinical question.
 
-def make_document_search(testing=False):
-    @tool
-    def document_search(query: str) -> str:
-        """Use this tool when you need to answer any medical or clinical question.
+    Args:
+        query: The user's medical question as a plain string.
 
-        Args:
-            query: The user's medical question as a plain string.
+    Returns:
+        A string of the most relevant passages from the medical documents.
+    """
+    k = 8
+    print(f"[tool] document_search called: query={query!r}")
+    try:
+        vectorstore = get_vectorstore()
+        results = vectorstore.similarity_search_with_score(query, k=k)
+    except Exception as e:
+        return f"Retrieval failed: {str(e)}"
 
-        Returns:
-            A string of the most relevant passages from the medical documents.
-        """
-        k = 5
-        print(f"[tool] document_search called: query={query!r}")
-        try:
-            vectorstore = get_vectorstore()
-            results = vectorstore.similarity_search_with_score(query, k=k)
-        except Exception as e:
-            return f"Retrieval failed: {str(e)}"
+    return "\n\n".join(doc.page_content for doc, _ in results)
 
-        if not testing and lf is not None:
-            try:
-                with lf.start_as_current_observation(as_type="span", name="retrieval") as obs:
-                    obs.update(
-                        input={"query": query, "k": k},
-                        output=[{"content": doc.page_content, "score": float(score)} for doc, score in results],
-                    )
-            except Exception as e:
-                print(f"Langfuse logging failed: {e}")
 
-        return "\n\n".join(doc.page_content for doc, _ in results)
-    return document_search
+@tool
+def web_search(query: str) -> str:
+    """Use this tool to search the web for information not found in the medical documents.
 
-# default instance used by agent.py — set testing=True in sandbox to skip Langfuse logging
-document_search = make_document_search()
+    Args:
+        query: The search query as a plain string.
+
+    Returns:
+        A string of the most relevant web search results.
+    """
+    from tavily import TavilyClient
+    import os
+    print(f"[tool] web_search called: query={query!r}")
+    try:
+        client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+        results = client.search(query, max_results=2)
+        return "\n\n".join(
+            f"{r['title']}\n{r['url']}\n{r['content']}"
+            for r in results.get("results", [])
+        )
+    except Exception as e:
+        return f"Web search failed: {str(e)}"

@@ -1,0 +1,28 @@
+# Clean EC2 and deploy
+
+Remove stale files on EC2, verify requirements are up to date, then deploy fresh.
+
+## Steps
+
+1. **Check requirements are complete** — scan all `.py` files for `import` and `from` statements. For any third-party library found, verify it exists in both `requirements.txt` and `requirements.server.txt`. Report any that are missing and add them before deploying.
+
+2. **Remove stale agent files on EC2** — list `agent_*.py` files on the instance and compare to local files. Delete any that no longer exist locally:
+```bash
+ssh -i ./rag-key.pem -o StrictHostKeyChecking=no ec2-user@13.223.41.3 "ls /home/ec2-user/app/agent_*.py 2>/dev/null"
+```
+For each stale file:
+```bash
+ssh -i ./rag-key.pem -o StrictHostKeyChecking=no ec2-user@13.223.41.3 "rm /home/ec2-user/app/<stale_file>.py"
+```
+
+3. **Run the deploy script**:
+```bash
+./deploy.sh
+```
+
+4. **Tail logs** to confirm the server started cleanly:
+```bash
+ssh -i ./rag-key.pem -o StrictHostKeyChecking=no ec2-user@13.223.41.3 "docker logs rag-chatbot --tail 20 2>&1"
+```
+
+5. Report: which stale files were removed, which packages were added to requirements, and confirm the server is running at http://13.223.41.3:8000

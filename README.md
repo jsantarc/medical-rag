@@ -38,12 +38,27 @@ This project acts as an experimentation sandbox for AI agent development rather 
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 ![Docling](https://img.shields.io/badge/Docling-PDF%20Parsing-red)
 ![AWS EC2](https://img.shields.io/badge/AWS-EC2%20Ready-FF9900?logo=amazon-aws&logoColor=white)
+![Tavily](https://img.shields.io/badge/Tavily-Web%20Search-blue)
 
 ---
 
 ## Overview
 
 DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Generation) pipeline over verified medical PDFs. It streams responses token-by-token and is fully observable via Langfuse.
+
+## Rapid Agent Prototyping
+
+This repository is designed as a lightweight environment for rapidly prototyping and evaluating AI agents locally or on EC2.
+
+The architecture keeps experimentation simple:
+
+- `agent_{name}.py` — individual agent implementations and workflows
+- `agent_stream.py` — streaming wrapper used to deliver agent responses in real time
+- `main.py` — entry point for running and testing agents locally or on EC2
+
+The goal is to make it easy to prototype new agent ideas, compare orchestration strategies, test prompts and retrieval pipelines, inspect traces and evaluations, and iterate without heavy infrastructure.
+
+> This project is an experimentation sandbox for AI agent development, not a production-ready medical system.
 
 ## Stack
 
@@ -63,10 +78,11 @@ DiabetesAssist answers clinical questions using a RAG (Retrieval-Augmented Gener
 
 - **RAG pipeline** — ingests medical PDFs, chunks, embeds, and retrieves with ChromaDB
 - **Streaming responses** — token-by-token streaming via FastAPI
-- **LangGraph agent** — tool-calling agent with conditional routing
+- **LangGraph agent** — tool-calling agent with conditional routing, always grounded in local documents
 - **Langfuse observability** — every trace logged with tokens, latency, and costs
 - **LLM-as-Judge eval** — automated evaluation notebook scoring faithfulness and relevance
 - **Correctness dataset** — ground-truth Q&A pairs uploaded to Langfuse for repeatable evals
+- **Tavily web search** — available as an optional tool for sandbox experimentation; not used in the default agent as it interferes with faithfulness scores
 - **Dockerized** — single command to build and run
 
 ## Project Structure
