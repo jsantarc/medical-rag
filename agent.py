@@ -1,6 +1,4 @@
 import time
-import aiosqlite
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -8,7 +6,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage
 from langgraph.graph import StateGraph, MessagesState, END
 from langgraph.prebuilt import ToolNode
-from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langfuse.langchain import CallbackHandler
 
 from deps import make_obj
@@ -25,7 +22,8 @@ Add a safety disclaimer when discussing dosages, insulin regimens, or drug inter
 Focus on topics including: Type 1 and Type 2 diabetes, prediabetes, gestational diabetes,
 blood glucose management, HbA1c targets, medications (metformin, insulin, GLP-1 agonists, SGLT2 inhibitors),
 dietary guidance, and diabetes complications.
-If a question is outside the scope of available documents, say so clearly."""),
+If a question is outside the scope of available documents, say so clearly.
+Always call document_search at most once per question."""),
     MessagesPlaceholder("messages"),
 ])
 
@@ -33,11 +31,9 @@ tools = [document_search]
 tool_node = ToolNode(tools)
 llm = AGENT_PROMPT | make_obj().bind_tools(tools)
 
-_agent = None
 
-
-def call_model(state: MessagesState):
-    response = llm.invoke({"messages": state["messages"]})
+async def call_model(state: MessagesState):
+    response = await llm.ainvoke({"messages": state["messages"]})
     return {"messages": [response]}
 
 def should_continue(state: MessagesState):
@@ -55,36 +51,21 @@ def _build_graph():
     graph.add_edge("tools", "agent")
     return graph
 
-async def _get_agent():
-    global _agent
-    if _agent is None:
-        conn = await aiosqlite.connect("memory.db")
-        checkpointer = AsyncSqliteSaver(conn)
-        await checkpointer.setup()
-        _agent = _build_graph().compile(checkpointer=checkpointer)
-    return _agent
+agent = _build_graph().compile().with_config({"recursion_limit": 10})
 
-def reset_agent():
-    global _agent
-    _agent = None
 
-async def stream_agent_response(message: str, session_id: str = "default"):
+async def stream_agent_response(message: str):
     t0 = time.time()
-    agent = await _get_agent()
-    print(f"[timing] agent ready: {time.time() - t0:.2f}s")
-
-    config = {"configurable": {"thread_id": session_id}, "callbacks": [langfuse_handler]}
+    config = {"callbacks": [langfuse_handler]}
     first_token = True
-    async for event in agent.astream_events(
+    async for msg, metadata in agent.astream(
         {"messages": [HumanMessage(content=message)]},
         config=config,
-        version="v2"
+        stream_mode="messages",
     ):
-        if event["event"] == "on_chat_model_stream":
-            token = event["data"]["chunk"].content
-            if token:
-                if first_token:
-                    print(f"[timing] first token: {time.time() - t0:.2f}s")
-                    first_token = False
-                yield token
+        if msg.content and metadata["langgraph_node"] == "agent":
+            if first_token:
+                print(f"[timing] first token: {time.time() - t0:.2f}s")
+                first_token = False
+            yield msg.content
     print(f"[timing] total: {time.time() - t0:.2f}s")

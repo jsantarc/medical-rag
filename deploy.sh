@@ -2,7 +2,7 @@
 # Deploy agent files and ChromaDB to EC2
 # Usage: ./deploy.sh
 
-#EC2_HOST="ec2-user@13.223.41.3"
+EC2_HOST="ec2-user@13.223.41.3"
 SSH_KEY="./rag-key.pem"
 REMOTE_DIR="/home/ec2-user/app"
 

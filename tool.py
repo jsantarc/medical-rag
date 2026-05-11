@@ -10,16 +10,17 @@ except Exception:
 
 def make_document_search(testing=False):
     @tool
-    def document_search(query: str, k: int = 3) -> str:
+    def document_search(query: str) -> str:
         """Use this tool when you need to answer any medical or clinical question.
 
         Args:
             query: The user's medical question as a plain string.
-            k: Number of document chunks to retrieve. Default is 3.
 
         Returns:
             A string of the most relevant passages from the medical documents.
         """
+        k = 3
+        print(f"[tool] document_search called: query={query!r}")
         try:
             vectorstore = get_vectorstore()
             results = vectorstore.similarity_search_with_score(query, k=k)
