@@ -3,7 +3,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langchain.tools import tool
+from langfuse import get_client
 from deps import get_vectorstore
+
+lf = get_client()
 
 @tool
 def document_search(query: str) -> str:
@@ -20,10 +23,18 @@ def document_search(query: str) -> str:
     try:
         vectorstore = get_vectorstore()
         results = vectorstore.similarity_search_with_score(query, k=k)
+        with lf.start_as_current_observation(as_type="span", name="retrieval") as obs:
+            obs.update(
+                input={"query": query, "k": k},
+                output=[
+                    {"content": doc.page_content, "score": float(score)}
+                    for doc, score in results
+                ],
+            )
     except Exception as e:
         return f"Retrieval failed: {str(e)}"
 
-    return "\n\n".join(doc.page_content for doc, _ in results)
+    return "\n\n".join(doc.page_content for doc, score in results)
 
 
 @tool
