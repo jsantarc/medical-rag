@@ -24,6 +24,9 @@ env/
 chroma_db/chroma_db/
 chroma_db/chroma.sqlite3
 
+# Embedding experiments (recalculate locally, not deployed)
+embeddings/
+
 # Conversation memory
 memory.db
 memory.db-*

@@ -1,5 +1,18 @@
 """
-agent_graph.py — ReAct agent graph with query optimizer node.
+agent_graph_optimizer.py — ReAct agent graph with query optimizer node.
+
+NOTE: NOT COMPATIBLE WITH agent_stream.py (streaming mode).
+
+The optimizer requires a complete first-pass answer before it can rewrite the
+query. agent_stream.py uses stream_mode="messages" which yields tokens as they
+arrive — there is no buffering point between the first agent answer and the
+optimizer node. The result is that the first-pass answer streams out to the
+client before the optimizer ever runs, so the user sees the unoptimized response
+and then gets a second response after the optimizer fires, which is confusing.
+
+To use this graph you must collect the full response with agent.ainvoke() (no
+streaming) and return it all at once. See experiments/agent_state_sandbox.ipynb
+for a working non-streaming example.
 """
 
 from langchain_core.messages import HumanMessage

@@ -12,10 +12,11 @@ COPY requirements.server.txt .
 RUN pip install --no-cache-dir -r requirements.server.txt
 
 # copy app source
-COPY main.py agent_graph.py agent_stream.py deps.py tool.py schemas.py index.html ./
+COPY main.py deps.py tool.py schemas.py index.html ./
+COPY agent_*.py ./
 
 # copy the pre-built vectorstore
-COPY chroma_db/ ./chroma_db/
+COPY embeddings/ ./embeddings/
 
 EXPOSE 8000
 

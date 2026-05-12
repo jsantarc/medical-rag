@@ -11,7 +11,7 @@ load_dotenv()
 
 CHAT_MODEL  = os.getenv("CHAT_MODEL", "gpt-4o-mini")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "text-embedding-3-small")
-CHROMA_DIR  = str(Path(__file__).parent / "chroma_db" / "chroma_db")
+CHROMA_DIR  = str(Path(__file__).parent / "embeddings")
 
 @lru_cache(maxsize=1)
 def make_obj():

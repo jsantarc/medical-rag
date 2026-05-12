@@ -6,14 +6,16 @@ Sync all agent files to EC2 and do a clean Docker rebuild.
 
 1. **Check requirements are in sync** — verify every package in `requirements.server.txt` is also in `requirements.txt`. If any are missing, add them to `requirements.txt` and report what was added.
 
-2. **Run the deploy script**:
+2. **Check vectorstore exists** — verify that the `embeddings/` directory exists and is not empty. If it's missing or empty, stop and tell the user to run `python chroma_db/ingest.py` first.
+
+3. **Run the deploy script**:
 ```bash
 ./deploy.sh
 ```
 
-3. **Tail the container logs** to confirm the server started cleanly:
+4. **Tail the container logs** to confirm the server started cleanly:
 ```bash
 ssh -i ./rag-key.pem -o StrictHostKeyChecking=no ec2-user@13.223.41.3 "docker logs rag-chatbot --tail 20 2>&1"
 ```
 
-4. Report the result — server URL, any errors from the logs, and which `agent_*.py` files were deployed.
+5. Report the result — server URL, any errors from the logs, which `agent_*.py` files were deployed, and which `EMBED_MODEL` is active.

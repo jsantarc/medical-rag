@@ -11,10 +11,11 @@ from langchain_openai import OpenAIEmbeddings
 
 load_dotenv()
 
-PDF_PATH = Path(__file__).parent.parent / "data"
-CHROMA_DIR   = "chroma_db"
-CHUNK_SIZE   = 512
-CHUNK_OVERLAP = 64
+PDF_PATH     = Path(__file__).parent.parent / "data"
+EMBED_MODEL   = os.getenv("EMBED_MODEL", "text-embedding-3-small")
+CHUNK_SIZE    = 1024
+CHUNK_OVERLAP = 200
+CHROMA_DIR    = str(Path(__file__).parent.parent / "embeddings")
 STORE_MARKDOWN = True
 
 def load_documents():
@@ -51,7 +52,7 @@ def build_vectorstore(chunks):
     print("\n Embedding and storing in Chroma...")
     Chroma.from_documents(
         documents=chunks,
-        embedding=OpenAIEmbeddings(model="text-embedding-3-small"),
+        embedding=OpenAIEmbeddings(model=EMBED_MODEL),
         persist_directory=CHROMA_DIR)
     print(f"Done. Vectorstore saved to {CHROMA_DIR}/")
 

@@ -26,8 +26,9 @@ rsync -avz --progress \
   --include="index.html" \
   --include="Dockerfile" \
   --include=".env" \
-  --include="chroma_db/" \
-  --include="chroma_db/**" \
+  --include="embeddings/" \
+  --exclude="embeddings/text-embedding-3-small" \
+  --include="embeddings/**" \
   --exclude="*" \
   ./ "$EC2_HOST:$REMOTE_DIR"
 
