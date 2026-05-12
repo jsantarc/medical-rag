@@ -1,29 +1,42 @@
 import time
+import aiosqlite
 from langchain_core.messages import HumanMessage
 from langfuse.langchain import CallbackHandler
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from agent_graph import _build_graph
 
-agent = _build_graph().compile().with_config({"recursion_limit": 10})
+_graph = _build_graph()
+_checkpointer = None
+_agent = None
 
 
-async def stream_agent_response(message: str):
+async def get_agent():
+    global _checkpointer, _agent
+    if _agent is None:
+        conn = await aiosqlite.connect("memory.db")
+        _checkpointer = AsyncSqliteSaver(conn)
+        await _checkpointer.setup()
+        _agent = _graph.compile(checkpointer=_checkpointer).with_config({"recursion_limit": 5})
+    return _agent
+
+
+async def stream_agent_response(message: str, session_id: str = "default"):
     t0 = time.time()
-    config = {"callbacks": [CallbackHandler()]}
+    agent = await get_agent()
+    config = {
+        "callbacks": [CallbackHandler()],
+        "configurable": {"thread_id": session_id},
+    }
     first_token = True
-    routed = False
     async for msg, metadata in agent.astream(
         {"messages": [HumanMessage(content=message)]},
         config=config,
         stream_mode="messages",
     ):
-        if not routed and metadata["langgraph_node"] == "tools":
+        if metadata["langgraph_node"] == "tools":
             print(f"[route] {msg.name}")
-            routed = True
         if msg.content and metadata["langgraph_node"] == "agent":
-            if not routed:
-                print("[route] llm")
-                routed = True
             if first_token:
                 print(f"[timing] first token: {time.time() - t0:.2f}s")
                 first_token = False

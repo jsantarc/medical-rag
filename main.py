@@ -50,7 +50,7 @@ async def chat(request: ChatRequest):
     logger.info(f"Question: {request.message}")
 
     async def token_generator():
-        async for token in stream_agent_response(message=request.message):
+        async for token in stream_agent_response(message=request.message, session_id=request.session_id):
             yield token
 
     return StreamingResponse(token_generator(), media_type="text/plain")

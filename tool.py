@@ -15,7 +15,7 @@ def document_search(query: str) -> str:
     Returns:
         A string of the most relevant passages from the medical documents.
     """
-    k = 8
+    k = 5
     print(f"[tool] document_search called: query={query!r}")
     try:
         vectorstore = get_vectorstore()
