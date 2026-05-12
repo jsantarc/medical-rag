@@ -65,6 +65,7 @@ The goal is to make it easy to prototype new agent ideas, compare orchestration 
 medical-rag/
 ├── main.py                   # FastAPI app — serves UI and /chat endpoint
 ├── agent_graph.py            # LangGraph graph definition (nodes, edges, prompt)
+├── agent_graph_optimizer.py  # not working with streaming 
 ├── agent_stream.py           # Async streaming runner with Langfuse callback
 ├── deps.py                   # Shared dependencies (LLM, vectorstore)
 ├── tool.py                   # document_search RAG tool (factory pattern, testing flag)
